@@ -1,0 +1,21 @@
+[
+    {
+      "name": "Garlic Fried Rice",
+      "description": "Easy rice dish with garlic, egg, and soy sauce",
+      "cost": 2.0,
+      "prepTime": 10
+    },
+    {
+      "name": "Tomato Pasta",
+      "description": "Simple spaghetti with tomato sauce and basil",
+      "cost": 3.0,
+      "prepTime": 15
+    },
+    {
+      "name": "Peanut Butter Sandwich",
+      "description": "Quick sandwich with peanut butter and banana",
+      "cost": 1.5,
+      "prepTime": 5
+    }
+  ]
+  
