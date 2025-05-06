@@ -1,54 +1,33 @@
-import { useState } from 'react';
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import MealGrid from './components/MealGrid';
+import React, { useState } from "react";
+import MealForm from "./components/MealForm";
+import MealGrid from "./components/MealGrid";
 
-function App() {
-  const [query, setQuery] = useState('');
-  const [meals, setMeals] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const getMeals = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      const res = await fetch('http://localhost:5000/recommend', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query }),
-      });
-
-      if (!res.ok) throw new Error('Failed to fetch');
-
-      const data = await res.json();
-      setMeals(data);
-    } catch (err) {
-      setError('Something went wrong. Please try again!');
-    } finally {
-      setLoading(false);
-    }
-  };
+export default function App() {
+  const [results, setResults] = useState([]);
 
   return (
-    <div className="bg-[#fef7ee] min-h-screen font-sans text-gray-800">
-      <Navbar />
-      <Hero query={query} setQuery={setQuery} onSearch={getMeals} />
-      
-      <section className="max-w-7xl mx-auto px-4 text-center">
-        {loading && (
-          <p className="text-yellow-500 font-medium text-lg animate-pulse my-4">
-            Searching for tasty meals...
-          </p>
-        )}
-        {error && (
-          <p className="text-red-500 font-medium text-lg my-4">{error}</p>
-        )}
-      </section>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 text-gray-800 font-sans">
+      <header className="py-8 text-center shadow-md bg-white">
+        <h1 className="text-4xl font-extrabold text-green-700">
+          🥗 AI Meal Planner
+        </h1>
+        <p className="text-sm mt-2 text-gray-500">
+          Get smart recipe recommendations based on your cravings.
+        </p>
+      </header>
 
-      <MealGrid meals={meals} />
+      <main className="max-w-4xl mx-auto px-6 py-10">
+        <MealForm setResults={setResults} />
+
+        {results.length > 0 && (
+          <section className="mt-12">
+            <h2 className="text-2xl font-semibold mb-4 text-gray-700">
+              Recommended Meals
+            </h2>
+            <MealGrid meals={results} />
+          </section>
+        )}
+      </main>
     </div>
   );
 }
-
-export default App;
