@@ -3,9 +3,13 @@ import React, { useState } from "react";
 const MealForm = ({ setResults }) => {
   const [query, setQuery] = useState("");
   const [preferredIngredients, setPreferredIngredients] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
 
     try {
       const response = await fetch("http://localhost:5000/recommend", {
@@ -26,37 +30,43 @@ const MealForm = ({ setResults }) => {
       });
 
       const data = await response.json();
-      console.log("📦 Received from backend:", data); // Debug log
+      console.log("📦 Received from backend:", data);
       setResults(data);
-    } catch (error) {
-      console.error("⚠️ Error fetching recommendations:", error);
+    } catch (err) {
+      console.error("⚠️ Error during fetch:", err);
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-md space-y-4">
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white p-6 rounded-xl shadow-md space-y-4"
+    >
       <div>
         <label className="block font-semibold text-gray-700 mb-1">
-          What do you feel like eating?
+          Describe what you feel like eating
         </label>
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="e.g. chicken, pasta, curry"
+          placeholder="e.g. something creamy with garlic and chicken"
           className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
         />
       </div>
 
       <div>
         <label className="block font-semibold text-gray-700 mb-1">
-          Preferred Ingredients
+          (Optional) Must-have ingredients
         </label>
         <input
           type="text"
           value={preferredIngredients}
           onChange={(e) => setPreferredIngredients(e.target.value)}
-          placeholder="e.g. rice, tomato, cheese"
+          placeholder="e.g. rice, tomato, avocado"
           className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
         />
       </div>
@@ -64,9 +74,12 @@ const MealForm = ({ setResults }) => {
       <button
         type="submit"
         className="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded hover:bg-green-700 transition"
+        disabled={loading}
       >
-        Get Recommendations
+        {loading ? "Searching..." : "Get Recommendations"}
       </button>
+
+      {error && <p className="text-red-500 text-sm">{error}</p>}
     </form>
   );
 };
