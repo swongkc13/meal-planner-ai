@@ -4,58 +4,64 @@ from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 
-# Load model once
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
-def get_recommendations(query, tags, max_budget, max_time, preferred_ingredients):
-    search_url = f"https://www.themealdb.com/api/json/v1/1/search.php?s={query}"
-    response = requests.get(search_url)
-    data = response.json()
+# Global cache
+MEAL_DATA = []
+MEAL_EMBEDDINGS = []
 
-    if not data.get("meals"):
-        print(f"❌ No meals for query: '{query}', using fallback: 'chicken'")
-        fallback_url = "https://www.themealdb.com/api/json/v1/1/search.php?s=chicken"
-        response = requests.get(fallback_url)
+def fetch_and_cache_meals():
+    print("📥 Fetching and caching meals...")
+    combined_meals = []
+
+    # Optionally use multiple queries to diversify results
+    for q in ["chicken", "beef", "rice", "pasta", "fish", "soup", "salad"]:
+        response = requests.get(f"https://www.themealdb.com/api/json/v1/1/search.php?s={q}")
         data = response.json()
+        if data.get("meals"):
+            combined_meals.extend(data["meals"])
 
-    if not data.get("meals"):
-        print("❌ Still no results after fallback.")
-        return []
+    print(f"✅ Fetched {len(combined_meals)} meals in total.")
 
-    raw_meals = data["meals"]
-    print(f"📥 {len(raw_meals)} meals fetched")
-
+    cached_meals = []
     texts = []
-    recipes = []
 
-    for meal in raw_meals:
+    for meal in combined_meals:
+        if not meal["strInstructions"]:
+            continue
+
         ingredients = [meal.get(f"strIngredient{i}") for i in range(1, 21)]
-        ingredients = [ing for ing in ingredients if ing]
+        ingredients = [i for i in ingredients if i]
 
-        if preferred_ingredients:
-            if not any(ing.lower() in [i.lower() for i in ingredients] for ing in preferred_ingredients):
-                continue
+        text = f"{meal['strMeal']}. {meal['strInstructions']}"
+        texts.append(text)
 
-        texts.append(f"{meal['strMeal']}. {meal['strInstructions']}")
-        recipes.append({
+        cached_meals.append({
             "name": meal["strMeal"],
             "description": meal["strInstructions"],
             "prep_time": random.randint(10, 30),
             "budget": random.choice([3, 5, 8, 10]),
             "tags": [meal["strCategory"], meal["strArea"]],
             "ingredients": ingredients,
-            "thumbnail": meal["strMealThumb"]  # 👈 Add thumbnail URL
+            "thumbnail": meal["strMealThumb"]
         })
 
-    if not recipes:
-        print("❌ No recipes after filtering.")
+    embeddings = model.encode(texts)
+    return cached_meals, embeddings
+
+# 🔁 Load cache at module load
+MEAL_DATA, MEAL_EMBEDDINGS = fetch_and_cache_meals()
+
+def get_recommendations(query, tags, max_budget, max_time, preferred_ingredients):
+    if not MEAL_DATA:
+        print("⚠️ No cached meals available.")
         return []
 
-    recipe_embeddings = model.encode(texts)
     query_embedding = model.encode([query])[0]
-    similarities = cosine_similarity([query_embedding], recipe_embeddings)[0]
+    similarities = cosine_similarity([query_embedding], MEAL_EMBEDDINGS)[0]
 
-    print("🔍 Similarity scores:", similarities)
-
+    # Get top matches
     top_indices = np.argsort(similarities)[::-1][:3]
-    return [recipes[i] for i in top_indices]
+    top_meals = [MEAL_DATA[i] for i in top_indices]
+
+    return top_meals
