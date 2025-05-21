@@ -31,7 +31,7 @@ const MealForm = ({ setResults }) => {
 
       const data = await response.json();
       console.log("📦 Received from backend:", data);
-      setResults(data);
+      setResults(data.results || []);
     } catch (err) {
       console.error("⚠️ Error during fetch:", err);
       setError("Something went wrong. Please try again.");
@@ -41,10 +41,7 @@ const MealForm = ({ setResults }) => {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="bg-white p-6 rounded-xl shadow-md space-y-4"
-    >
+    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-md space-y-4">
       <div>
         <label className="block font-semibold text-gray-700 mb-1">
           Describe what you feel like eating
@@ -66,20 +63,20 @@ const MealForm = ({ setResults }) => {
           type="text"
           value={preferredIngredients}
           onChange={(e) => setPreferredIngredients(e.target.value)}
-          placeholder="e.g. rice, tomato, avocado"
+          placeholder="e.g. garlic, spinach"
           className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
         />
       </div>
 
       <button
         type="submit"
-        className="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded hover:bg-green-700 transition"
         disabled={loading}
+        className="bg-green-600 text-white px-6 py-2 rounded shadow hover:bg-green-700 disabled:opacity-50"
       >
-        {loading ? "Searching..." : "Get Recommendations"}
+        {loading ? "Loading..." : "Get Recommendations"}
       </button>
 
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {error && <p className="text-red-500">{error}</p>}
     </form>
   );
 };
