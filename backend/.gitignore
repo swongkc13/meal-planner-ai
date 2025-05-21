@@ -34,3 +34,6 @@ recipes.json
 
 # Test outputs
 logs/
+
+# Ignore trained model output
+backend/tagger_model/
