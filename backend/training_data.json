@@ -1,0 +1,5 @@
+[
+  {"query": "I want a quick vegan meal", "tags": ["vegan", "quick"]},
+  {"query": "Give me a spicy chicken recipe", "tags": ["spicy", "chicken"]},
+  {"query": "Looking for a gluten-free dinner", "tags": ["gluten-free", "dinner"]}
+]

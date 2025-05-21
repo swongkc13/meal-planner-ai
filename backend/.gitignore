@@ -1,0 +1,36 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# IDE/editor
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS-generated
+.DS_Store
+Thumbs.db
+
+# Model artifacts
+tagger_model/
+*.joblib
+
+# Datasets and runtime files
+*.json
+cached_meals.json
+recipes.json
+
+# Test outputs
+logs/
