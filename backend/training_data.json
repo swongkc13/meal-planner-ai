@@ -1,8 +1,0 @@
-[
-  { "query": "I want a fast lunch", "tags": ["quick"] },
-  { "query": "Give me something low calorie", "tags": ["healthy"] },
-  { "query": "Looking for high protein dinner", "tags": ["high-protein"] },
-  { "query": "I need a vegetarian option", "tags": ["vegetarian"] },
-  { "query": "Quick and light lunch", "tags": ["quick", "healthy"] },
-  { "query": "Healthy and vegetarian meal", "tags": ["vegetarian", "healthy"] }
-]
