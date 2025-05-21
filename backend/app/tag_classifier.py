@@ -13,9 +13,11 @@ class QueryTagger:
         self.threshold = threshold
 
     def predict(self, text):
+        if not text.strip():
+            return []
         inputs = self.tokenizer(text, return_tensors="pt", truncation=True, padding=True)
         with torch.no_grad():
             logits = self.model(**inputs).logits
         probs = torch.sigmoid(logits).numpy()
         tags = self.mlb.inverse_transform(probs > self.threshold)
-        return tags[0] if tags else []
+        return list(tags[0]) if tags else []
